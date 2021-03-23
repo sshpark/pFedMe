@@ -1,5 +1,4 @@
 import torch
-import copy
 import torch.nn as nn
 import torch.nn.functional as F
 import os
@@ -36,13 +35,9 @@ class UserPerAvg(User):
     def train(self, epochs):
         LOSS = 0
         self.model.train()
-    def train(self, epochs):
-        LOSS = 0
-        self.model.train()
         for epoch in range(1, self.local_epochs + 1):  # local update 
+            
             self.model.train()
-
-            temp_model = copy.deepcopy(list(self.model.parameters()))
 
             #step 1
             X, y = self.get_next_train_batch()
@@ -58,11 +53,6 @@ class UserPerAvg(User):
             output = self.model(X)
             loss = self.loss(output, y)
             loss.backward()
-
-            # restore the model parameters to the one before first update
-            for old_p, new_p in zip(self.model.parameters(), temp_model):
-                old_p.data = new_p.data.clone()
-                
             self.optimizer.step(beta = self.beta)
 
             # clone model to user model 
